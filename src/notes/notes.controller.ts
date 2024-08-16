@@ -1,4 +1,4 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete, Query, Put } from '@nestjs/common';
+import { Controller, Get, Post, Body,  Param, Delete, Query, Put } from '@nestjs/common';
 import { NotesService } from './notes.service';
 import { CreateNoteDto } from './dto/create-note.dto';
 import { UpdateNoteDto } from './dto/update-note.dto';
@@ -12,6 +12,13 @@ export class NotesController {
   @UseGuards(AuthGuard)
   @Post()
   create(@Body() createNoteDto: CreateNoteDto) {
+    if (!createNoteDto) {
+      throw new Error('Note not found');
+    }else {
+      return {
+        message: 'Note created successfully',
+      }
+    }
     return this.notesService.create(createNoteDto);
   }
 
@@ -39,13 +46,24 @@ export class NotesController {
   @UseGuards(AuthGuard)
   @Put(':id')
   update(@Param('id') id: string, @Body() updateNoteDto: UpdateNoteDto) {
-    return this.notesService.update(id, updateNoteDto);
+
+    if(this.notesService.update(id, updateNoteDto)){
+      return { message: 'Note updated successfully', updated: true };
+    }else{
+      return { message: 'Note not found', updated: false };
+    }
+    return ;
   }
 
   @UseGuards(AuthGuard)
   @Delete(':id')
   remove(@Param('id') id: string) {
-    return this.notesService.remove(id);
+
+    if (this.notesService.remove(id)){
+      return { message: 'Note deleted successfully', deleted: true };
+    }else {
+      return { message: 'Note not found', deleted: false };
+    }
   }
 
 
